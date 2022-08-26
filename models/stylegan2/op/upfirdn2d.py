@@ -5,14 +5,15 @@ from torch.autograd import Function
 from torch.utils.cpp_extension import load
 
 module_path = os.path.dirname(__file__)
-upfirdn2d_op = load(
-    'upfirdn2d',
-    sources=[
-        os.path.join(module_path, 'upfirdn2d.cpp'),
-        os.path.join(module_path, 'upfirdn2d_kernel.cu'),
-    ],
-)
-
+# upfirdn2d_op = load(
+#     'upfirdn2d',
+#     sources=[
+#         os.path.join(module_path, 'upfirdn2d.cpp'),
+#         os.path.join(module_path, 'upfirdn2d_kernel.cu'),
+#     ],
+#     build_directory='/home/projects/hyperstyle/extension/upfirdn2d'
+# )
+upfirdn2d_op=torch.utils.cpp_extension._import_module_from_library('upfirdn2d','./extension/upfirdn2d',True)
 
 class UpFirDn2dBackward(Function):
     @staticmethod

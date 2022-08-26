@@ -76,7 +76,7 @@ class TrainOptions:
 
         # hypernet parameters
         self.parser.add_argument('--load_w_encoder', action='store_true', help='Whether to load the w e4e encoder.')
-        self.parser.add_argument('--w_encoder_checkpoint_path', default=model_paths["e4e_w_encoder"], type=str,
+        self.parser.add_argument('--w_encoder_checkpoint_path', default=model_paths["faces_w_encoder"], type=str,
                                  help='Path to pre-trained W-encoder.')
         self.parser.add_argument('--w_encoder_type', default='WEncoder',
                                  help='Encoder type for the encoder used to get the initial inversion')

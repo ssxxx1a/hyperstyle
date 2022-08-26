@@ -6,13 +6,15 @@ from torch.autograd import Function
 from torch.utils.cpp_extension import load
 
 module_path = os.path.dirname(__file__)
-fused = load(
-    'fused',
-    sources=[
-        os.path.join(module_path, 'fused_bias_act.cpp'),
-        os.path.join(module_path, 'fused_bias_act_kernel.cu'),
-    ],
-)
+# fused = load(
+#     'fused',
+#     sources=[
+#         os.path.join(module_path, 'fused_bias_act.cpp'),
+#         os.path.join(module_path, 'fused_bias_act_kernel.cu'),
+#     ],
+#     build_directory='/home/projects/hyperstyle/extension/fused'
+# )
+fused=torch.utils.cpp_extension._import_module_from_library('fused','./extension/fused',True)
 
 
 class FusedLeakyReLUFunctionBackward(Function):
