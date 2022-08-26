@@ -1,8 +1,0 @@
-README.md
-setup.py
-./extensions/fused_bias_act.cpp
-./extensions/fused_bias_act_kernel.cu
-fused.egg-info/PKG-INFO
-fused.egg-info/SOURCES.txt
-fused.egg-info/dependency_links.txt
-fused.egg-info/top_level.txt
