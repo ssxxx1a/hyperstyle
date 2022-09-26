@@ -531,11 +531,19 @@ class Generator(nn.Module):
         skip = self.to_rgb1(out, latent[:, 1], weights_delta=weights_deltas[1])
 
         i = 1
-        weight_idx = 2
+        weight_idx = 2 
         for conv1, conv2, noise1, noise2, to_rgb in zip(self.convs[::2], self.convs[1::2], noise[1::2], noise[2::2], self.to_rgbs):
             out = conv1(out, latent[:, i], noise=noise1, weights_delta=weights_deltas[weight_idx])
+           # if weights_deltas[weight_idx]!=None:
+            #    print('1',weights_deltas[weight_idx].size())
             out = conv2(out, latent[:, i + 1], noise=noise2, weights_delta=weights_deltas[weight_idx + 1])
+            #if weights_deltas[weight_idx+1]!=None:
+            #    print('2',weights_deltas[weight_idx+1].size())
             skip = to_rgb(out, latent[:, i + 2], skip, weights_delta=weights_deltas[weight_idx + 2])
+            #if weights_deltas[weight_idx+2]!=None:
+            #    print('3',weights_deltas[weight_idx+2].size())
+            #else:
+            #    print('3:None')
 
             i += 2
             weight_idx += 3

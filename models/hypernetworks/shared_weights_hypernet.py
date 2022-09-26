@@ -1,7 +1,7 @@
+import imp
 import torch
 import torch.nn as nn
 from torch.nn.parameter import Parameter
-
 
 class SharedWeightsHypernet(nn.Module):
 
@@ -23,7 +23,9 @@ class SharedWeightsHypernet(nn.Module):
 
     def forward(self, z):
         batch_size = z.shape[0]
+       # print('w1:',self.w1.size())
         h_in = torch.matmul(z, self.w2) + self.b2
+       # print('hin:',h_in.size())
         h_in = h_in.view(batch_size, self.in_size, self.z_dim)
 
         h_final = torch.matmul(h_in, self.w1) + self.b1

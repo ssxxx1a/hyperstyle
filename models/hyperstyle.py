@@ -3,13 +3,17 @@ import torch
 from torch import nn
 import copy
 from argparse import Namespace
-
 from models.encoders.psp import pSp
 from models.stylegan2.model import Generator
 from configs.paths_config import model_paths
 from models.hypernetworks.hypernetwork import SharedWeightsHyperNetResNet, SharedWeightsHyperNetResNetSeparable
 from utils.resnet_mapping import RESNET_MAPPING
-
+from e4e.encoders import psp_encoders
+def get_keys(d, name):
+    if 'state_dict' in d:
+        d = d['state_dict']
+    d_filt = {k[len(name) + 1:]: v for k, v in d.items() if k[:len(name)] == name}
+    return d_filt
 
 class HyperStyle(nn.Module):
 
@@ -25,7 +29,6 @@ class HyperStyle(nn.Module):
         self.load_weights()
         if self.opts.load_w_encoder:
             self.w_encoder.eval()
-
     def set_hypernet(self):
         if self.opts.output_size == 1024:
             self.opts.n_hypernet_outputs = 26
@@ -51,17 +54,31 @@ class HyperStyle(nn.Module):
             if self.opts.load_w_encoder:
                 self.w_encoder = self.__get_pretrained_w_encoder()
         else:
+            # hypernet_ckpt = self.__get_hypernet_checkpoint()
+            # self.hypernet.load_state_dict(hypernet_ckpt, strict=False)
+            # print(f'Loading decoder weights from pretrained path: {self.opts.stylegan_weights}')
+            # ckpt = torch.load(self.opts.stylegan_weights)
+            # self.decoder.load_state_dict(ckpt['g_ema'], strict=True)
+            # self.__load_latent_avg(ckpt, repeat=self.n_styles)
+            # if self.opts.load_w_encoder:
+            #     self.w_encoder = self.__get_pretrained_w_encoder()
+            '''aus '''
             hypernet_ckpt = self.__get_hypernet_checkpoint()
             self.hypernet.load_state_dict(hypernet_ckpt, strict=False)
             print(f'Loading decoder weights from pretrained path: {self.opts.stylegan_weights}')
-            ckpt = torch.load(self.opts.stylegan_weights)
-            self.decoder.load_state_dict(ckpt['g_ema'], strict=True)
+            ckpt = torch.load('../pretrained_models/best_e4e_wo_avg.pt')
+
+            self.decoder.load_state_dict(get_keys(ckpt, 'decoder'), strict=True)
             self.__load_latent_avg(ckpt, repeat=self.n_styles)
             if self.opts.load_w_encoder:
-                self.w_encoder = self.__get_pretrained_w_encoder()
+                #self.w_encoder = self.__get_pretrained_w_encoder()
+                '''aus'''
+                self.w_encoder = psp_encoders.Encoder4Editing(50, 'ir_se', self.opts)
+                self.w_encoder.load_state_dict(get_keys(ckpt, 'encoder'), strict=True)
+                self.w_encoder.eval()
 
     def forward(self, x, resize=True, input_code=False, randomize_noise=True, return_latents=False,
-                return_weight_deltas_and_codes=False, weights_deltas=None, y_hat=None, codes=None):
+                return_weight_deltas_and_codes=False, weights_deltas=None, y_hat=None, codes=None,delta_au=None):
 
         if input_code:
             codes = x
@@ -72,9 +89,14 @@ class HyperStyle(nn.Module):
 
             # concatenate original input with w-reconstruction or current reconstruction
             x_input = torch.cat([x, y_hat], dim=1)
-
+            
             # pass through hypernet to get per-layer deltas
-            hypernet_outputs = self.hypernet(x_input)
+            hypernet_outputs = self.hypernet(x_input,delta_aus=delta_au)
+            #for i in hypernet_outputs:
+                # if i!=None:
+                #     print(i.size()) 
+                # else:
+                #     print('None')
             if weights_deltas is None:
                 weights_deltas = hypernet_outputs
             else:

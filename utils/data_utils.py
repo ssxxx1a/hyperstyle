@@ -16,6 +16,7 @@ def is_image_file(filename):
 
 def make_dataset(dir):
     images = []
+    print(os.path.isdir(dir))
     assert os.path.isdir(dir), '%s is not a valid directory' % dir
     for fname in os.listdir(dir):
         if is_image_file(fname):

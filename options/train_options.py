@@ -11,11 +11,11 @@ class TrainOptions:
 
     def initialize(self):
         # general setup
-        self.parser.add_argument('--exp_dir', type=str,
+        self.parser.add_argument('--exp_dir', type=str, default='experiments/hyperstyle',
                                  help='Path to experiment output directory')
-        self.parser.add_argument('--dataset_type', default='ffhq_encode', type=str,
+        self.parser.add_argument('--dataset_type', default='ffhq_hypernet', type=str,
                                  help='Type of dataset/experiment to run')
-        self.parser.add_argument('--encoder_type', default='HyperNet', type=str,
+        self.parser.add_argument('--encoder_type', default='SharedWeightsHyperNetResNet', type=str,
                                  help='Which encoder to use')
         self.parser.add_argument('--input_nc', default=6, type=int,
                                  help='Number of input image channels to the HyperStyle network. Should be set to 6.')
@@ -82,7 +82,11 @@ class TrainOptions:
                                  help='Encoder type for the encoder used to get the initial inversion')
         self.parser.add_argument('--layers_to_tune', default='0,2,3,5,6,8,9,11,12,14,15,17,18,20,21,23,24', type=str,
                                  help='comma-separated list of which layers of the StyleGAN generator to tune')
-
+        #aus params.
+        self.parser.add_argument('--data_type', type=str, default='pkl', help='data_type of  aus')
+        self.parser.add_argument('--root_path', default='/data/Data/GANsData/AffectNet/', type=str)
+        self.parser.add_argument('--data_train', default='EGAGAN_data_train.pkl', type=str, help='???')
+        self.parser.add_argument('--data_val', default='EGAGAN_data_val.pkl', type=str, help='???')
     def parse(self):
         opts = self.parser.parse_args()
         return opts

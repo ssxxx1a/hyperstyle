@@ -18,10 +18,9 @@ from utils.inference_utils import run_inversion
 from utils.model_utils import load_model
 from options.test_options import TestOptions
 
-
 def run():
     test_opts = TestOptions().parse()
-
+    print(test_opts)
     out_path_results = os.path.join(test_opts.exp_dir, 'inference_results')
     out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled')
 
@@ -90,8 +89,8 @@ def run():
                 os.makedirs(weight_deltas_dir, exist_ok=True)
                 np.save(os.path.join(weight_deltas_dir, os.path.basename(im_path).split('.')[0] + ".npy"),
                         result_deltas[i][-1])
-
             global_i += 1
+        break
 
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
     result_str = 'Runtime {:.4f}+-{:.4f}'.format(np.mean(global_time), np.std(global_time))

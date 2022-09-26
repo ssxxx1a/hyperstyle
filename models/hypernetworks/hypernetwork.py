@@ -1,7 +1,7 @@
 from torch import nn
 from torch.nn import BatchNorm2d, PReLU, Sequential, Module
 from torchvision.models import resnet34
-
+import torch
 from models.hypernetworks.refinement_blocks import HyperRefinementBlock, RefinementBlock, RefinementBlockSeparable
 from models.hypernetworks.shared_weights_hypernet import SharedWeightsHypernet
 
@@ -41,22 +41,38 @@ class SharedWeightsHyperNetResNet(Module):
         for layer_idx in range(self.n_outputs):
             if layer_idx in self.layers_to_tune:
                 if layer_idx in self.shared_layers:
-                    refinement_block = HyperRefinementBlock(self.shared_weight_hypernet, n_channels=512, inner_c=128)
+                    refinement_block = HyperRefinementBlock(self.shared_weight_hypernet, n_channels=512+0, inner_c=128)
                 else:
-                    refinement_block = RefinementBlock(layer_idx, opts, n_channels=512, inner_c=256)
+                    refinement_block = RefinementBlock(layer_idx, opts, n_channels=512+0, inner_c=256)
             else:
                 refinement_block = None
             self.refinement_blocks.append(refinement_block)
+        # for aus load
+        # self.aus_network=nn.Sequential(
+        #     nn.Linear(17,16*16)
+        # )
 
-    def forward(self, x):
+    def forward(self, x,delta_aus=None):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.body(x)
+    #     '''
+    #     第一种，映射成16x16，直接concat试试
+    #     '''
+    #     aus=self.aus_network(delta_aus)
+    #     #print(aus.size())
+    #     aus=aus.resize(aus.size(0),1,16,16)
+    #    # aus=aus.repeat(1,1,1,1)
+    #     #print(aus.size())
+    #     x=torch.cat([x,aus],dim=1)
+    #     #print(x.size())
+        
         weight_deltas = []
         for j in range(self.n_outputs):
             if self.refinement_blocks[j] is not None:
                 delta = self.refinement_blocks[j](x)
+              #  print(str(j)+':',delta.size())
             else:
                 delta = None
             weight_deltas.append(delta)

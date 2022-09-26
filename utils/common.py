@@ -38,13 +38,13 @@ def vis_faces_with_id(hooks_dict, fig, gs, i):
 
 def vis_faces_iterative(hooks_dict, fig, gs, i):
     plt.imshow(hooks_dict['input_face'])
-    plt.title('Input\nOut Sim={:.2f}'.format(float(hooks_dict['diff_input'])))
+    #plt.title('Input\nOut Sim={:.2f}'.format(float(hooks_dict['diff_input'])))
     fig.add_subplot(gs[i, 1])
     plt.imshow(hooks_dict['w_inversion'])
     plt.title('W-Inversion\n')
     fig.add_subplot(gs[i, 2])
     plt.imshow(hooks_dict['target_face'])
-    plt.title('Target\nIn={:.2f}, Out={:.2f}'.format(float(hooks_dict['diff_views']), float(hooks_dict['diff_target'])))
+    #plt.title('Target\nIn={:.2f}, Out={:.2f}'.format(float(hooks_dict['diff_views']), float(hooks_dict['diff_target'])))
     for idx, output_idx in enumerate(range(len(hooks_dict['output_face']) - 1, -1, -1)):
         output_image, similarity = hooks_dict['output_face'][output_idx]
         fig.add_subplot(gs[i, 3 + idx])
